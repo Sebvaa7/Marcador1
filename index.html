@@ -12,6 +12,15 @@
       justify-content: center;
       padding-top: 20px;
     }
+    
+    /* Modo OBS */
+    body.modo-obs {
+      padding-top: 0 !important;
+      justify-content: center !important;
+    }
+    body.modo-obs #controles {
+      display: none !important;
+    }
 
     #contenedor-principal {
       display: flex;
@@ -26,7 +35,7 @@
       font-size: 14px;
       color: white;
       background: rgba(0, 0, 0, 0.5);
-      padding: 5px 25px; /* Aumentamos el padding para los corchetes */
+      padding: 5px 25px;
       font-weight: bold;
       border-radius: 3px 3px 0 0;
       margin-bottom: 5px;
@@ -198,6 +207,24 @@
     .control-group input[type="number"] {
       width: 50px;
     }
+
+    /* Estilo del botón Copiar URL */
+    #generar-url-btn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background: #FFD700;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    #generar-url-btn:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
   </style>
 </head>
 <body>
@@ -274,13 +301,19 @@
         <label>Tiempo (mm:ss)</label>
         <input type="text" value="04:35" onchange="document.getElementById('reloj').textContent=this.value">
       </div>
+      <button id="generar-url-btn">Copiar URL para OBS</button>
     </div>
   </div>
 
   <script>
+    // Activar modo OBS si hay parámetro en la URL
+    if(window.location.search.includes('obs=1')) {
+      document.body.classList.add('modo-obs');
+    }
+
+    // Actualizar color de barras
     function updateBarColor(color) {
       document.getElementById('barra').style.background = color;
-      // Actualizar también el color de los corchetes
       const style = document.createElement('style');
       style.innerHTML = `
         .evento::before,
@@ -290,12 +323,42 @@
       `;
       document.head.appendChild(style);
     }
-    // Ocultar controles cuando se usa en OBS
-if(window.location.href.includes('obs=1')) {
-  document.getElementById('controles').style.display = 'none';
-  document.body.style.paddingTop = '0';
-  document.body.style.justifyContent = 'center';
-}
+
+    // Función para copiar al portapapeles
+    function copiarPortapapeles(texto) {
+      navigator.clipboard.writeText(texto).then(() => {
+        const boton = document.getElementById('generar-url-btn');
+        const textoOriginal = boton.textContent;
+        boton.textContent = '¡URL Copiada!';
+        boton.style.background = '#4CAF50';
+        setTimeout(() => {
+          boton.textContent = textoOriginal;
+          boton.style.background = '#FFD700';
+        }, 2000);
+      }).catch(err => {
+        console.error('Error al copiar: ', err);
+        prompt('Por favor copia manualmente esta URL:', texto);
+      });
+    }
+
+    // Generar URL para OBS
+    document.getElementById('generar-url-btn').addEventListener('click', function() {
+      const baseURL = window.location.href.split('?')[0];
+      const params = new URLSearchParams({
+        obs: 1,
+        eq1: document.getElementById('equipo1').textContent,
+        eq2: document.getElementById('equipo2').textContent,
+        g1: document.getElementById('goles1').textContent,
+        g2: document.getElementById('goles2').textContent,
+        ev: document.getElementById('evento').textContent,
+        t: document.getElementById('reloj').textContent,
+        c1: document.getElementById('barra-equipo1').style.backgroundColor,
+        c2: document.getElementById('barra-equipo2').style.backgroundColor,
+        cb: document.getElementById('barra').style.backgroundColor
+      });
+      
+      copiarPortapapeles(`${baseURL}?${params.toString()}`);
+    });
   </script>
 </body>
 </html>
