@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Marcador TNT</title>
+  <style>
+    body {
+      margin: 0;
+      background: green;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding-top: 20px;
+    }
+
+    #contenedor-principal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: fit-content;
+    }
+
+    .evento {
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      color: white;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px 25px; /* Aumentamos el padding para los corchetes */
+      font-weight: bold;
+      border-radius: 3px 3px 0 0;
+      margin-bottom: 5px;
+      position: relative;
+    }
+
+    .evento::before,
+    .evento::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 20px;
+      background: transparent;
+      border: 3px double magenta;
+    }
+
+    .evento::before {
+      left: 8px;
+      border-right: none;
+      border-radius: 5px 0 0 5px;
+    }
+
+    .evento::after {
+      right: 8px;
+      border-left: none;
+      border-radius: 0 5px 5px 0;
+    }
+
+    .barras-equipos {
+      display: flex;
+      height: 8px;
+      width: 200px;
+      margin-bottom: -5px;
+      margin-right: 75px;
+    }
+
+    .barra-equipo {
+      flex: 1;
+    }
+
+    #marcador {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      padding: 5px 0;
+    }
+
+    .bloque-central {
+      display: flex;
+      align-items: center;
+      background: #f7f4f4;
+      padding: 5px 15px;
+    }
+
+    .equipo {
+      font-size: 20px;
+      width: 50px;
+      text-align: center;
+      color: black !important;
+    }
+
+    .goles {
+      font-size: 24px;
+      margin: 0 10px;
+    }
+
+    .separador {
+      width: 4px;
+      height: 25px;
+      background: magenta;
+    }
+
+    .reloj-container {
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .reloj {
+      font-size: 18px;
+      color: white;
+    }
+
+    /* Estilos para los controles */
+    #controles {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      color: white;
+      font-family: 'Arial Black', Arial, sans-serif;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      border: 2px solid #555;
+    }
+
+    #controles h3 {
+      margin: 0 0 10px 0;
+      text-align: center;
+      color: #FFD700;
+      text-transform: uppercase;
+      font-size: 16px;
+    }
+
+    .controles-equipos {
+      display: flex;
+      gap: 20px;
+    }
+
+    .controles-equipo {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 5px;
+      min-width: 180px;
+    }
+
+    .controles-equipo h4 {
+      margin: 0 0 8px 0;
+      text-align: center;
+      color: #FFD700;
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+    }
+
+    .controles-generales {
+      margin-top: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .controles-generales h4 {
+      margin: 0 0 8px 0;
+      text-align: center;
+      color: #FFD700;
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+    }
+
+    .control-group {
+      margin-bottom: 8px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 3px;
+      color: #DDD;
+    }
+
+    .control-group input {
+      width: 100%;
+      padding: 5px;
+      border-radius: 3px;
+      border: 1px solid #555;
+      background: #333;
+      color: white;
+    }
+
+    .control-group input[type="color"] {
+      height: 30px;
+      padding: 2px;
+    }
+
+    .control-group input[type="number"] {
+      width: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div id="contenedor-principal">
+    <div class="evento" id="evento">LIGA DE PRIMERA 2025 - FECHA 1</div>
+    <div class="barras-equipos">
+      <div class="barra-equipo" id="barra-equipo1" style="background-color: blue;"></div>
+      <div class="barra-equipo" id="barra-equipo2" style="background-color: red;"></div>
+    </div>
+    <div id="marcador">
+      <div class="bloque-central">
+        <div class="equipo" id="equipo1">IQUI</div>
+        <div class="goles" id="goles1">0</div>
+        <div class="separador" id="barra"></div>
+        <div class="goles" id="goles2">1</div>
+        <div class="equipo" id="equipo2">COQ</div>
+      </div>
+
+      <div class="reloj-container">
+        <span class="reloj" id="reloj">04:35</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controles -->
+  <div id="controles">
+    <h3>CONTROLES DEL MARCADOR</h3>
+    
+    <div class="controles-equipos">
+      <div class="controles-equipo">
+        <h4>EQUIPO 1</h4>
+        <div class="control-group">
+          <label>Nombre (4 letras)</label>
+          <input type="text" maxlength="4" value="IQUI" onchange="document.getElementById('equipo1').textContent=this.value.toUpperCase()">
+        </div>
+        <div class="control-group">
+          <label>Color de barra</label>
+          <input type="color" value="#0000FF" onchange="document.getElementById('barra-equipo1').style.backgroundColor=this.value">
+        </div>
+        <div class="control-group">
+          <label>Goles</label>
+          <input type="number" min="0" value="0" onchange="document.getElementById('goles1').textContent=this.value">
+        </div>
+      </div>
+      
+      <div class="controles-equipo">
+        <h4>EQUIPO 2</h4>
+        <div class="control-group">
+          <label>Nombre (4 letras)</label>
+          <input type="text" maxlength="4" value="COQ" onchange="document.getElementById('equipo2').textContent=this.value.toUpperCase()">
+        </div>
+        <div class="control-group">
+          <label>Color de barra</label>
+          <input type="color" value="#FF0000" onchange="document.getElementById('barra-equipo2').style.backgroundColor=this.value">
+        </div>
+        <div class="control-group">
+          <label>Goles</label>
+          <input type="number" min="0" value="1" onchange="document.getElementById('goles2').textContent=this.value">
+        </div>
+      </div>
+    </div>
+    
+    <div class="controles-generales">
+      <h4>CONFIGURACIÓN GENERAL</h4>
+      <div class="control-group">
+        <label>Nombre del evento</label>
+        <input type="text" value="LIGA DE PRIMERA 2025 - FECHA 1" onchange="document.getElementById('evento').textContent=this.value">
+      </div>
+      <div class="control-group">
+        <label>Color barra central</label>
+        <input type="color" value="#FF00FF" onchange="updateBarColor(this.value)">
+      </div>
+      <div class="control-group">
+        <label>Tiempo (mm:ss)</label>
+        <input type="text" value="04:35" onchange="document.getElementById('reloj').textContent=this.value">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateBarColor(color) {
+      document.getElementById('barra').style.background = color;
+      // Actualizar también el color de los corchetes
+      const style = document.createElement('style');
+      style.innerHTML = `
+        .evento::before,
+        .evento::after {
+          border-color: ${color} !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    // Ocultar controles cuando se usa en OBS
+if(window.location.href.includes('obs=1')) {
+  document.getElementById('controles').style.display = 'none';
+  document.body.style.paddingTop = '0';
+  document.body.style.justifyContent = 'center';
+}
+  </script>
+</body>
+</html>
