@@ -306,10 +306,6 @@
   </div>
 
   <script>
-    // Activar modo OBS si hay parámetro en la URL
-    if(window.location.search.includes('obs=1')) {
-      document.body.classList.add('modo-obs');
-    }
 
     // Actualizar color de barras
     function updateBarColor(color) {
@@ -324,65 +320,77 @@
       document.head.appendChild(style);
     }
 
-    // Función para copiar al portapapeles
-    function copiarPortapapeles(texto) {
-      navigator.clipboard.writeText(texto).then(() => {
-        const boton = document.getElementById('generar-url-btn');
-        const textoOriginal = boton.textContent;
-        boton.textContent = '¡URL Copiada!';
-        boton.style.background = '#4CAF50';
-        setTimeout(() => {
-          boton.textContent = textoOriginal;
-          boton.style.background = '#FFD700';
-        }, 2000);
-      }).catch(err => {
-        console.error('Error al copiar: ', err);
-        prompt('Por favor copia manualmente esta URL:', texto);
-      });
+    // Configuración inicial
+    if(window.location.search.includes('obs=1')) {
+        document.body.classList.add('modo-obs');
     }
 
-    // Generar URL para OBS
-    document.getElementById('generar-url-btn').addEventListener('click', function() {
-      const baseURL = window.location.href.split('?')[0];
-      const params = new URLSearchParams({
-        obs: 1,
-        eq1: document.getElementById('equipo1').textContent,
-        eq2: document.getElementById('equipo2').textContent,
-        g1: document.getElementById('goles1').textContent,
-        g2: document.getElementById('goles2').textContent,
-        ev: document.getElementById('evento').textContent,
-        t: document.getElementById('reloj').textContent,
-        c1: document.getElementById('barra-equipo1').style.backgroundColor,
-        c2: document.getElementById('barra-equipo2').style.backgroundColor,
-        cb: document.getElementById('barra').style.backgroundColor
-      });
-      
-      copiarPortapapeles(`${baseURL}?${params.toString()}`);
+    // Función para forzar refresco en OBS
+    function actualizarOBS() {
+        const baseURL = window.location.href.split('?')[0];
+        const params = new URLSearchParams({
+            obs: 1,
+            eq1: document.getElementById('equipo1').textContent,
+            eq2: document.getElementById('equipo2').textContent,
+            g1: document.getElementById('goles1').textContent,
+            g2: document.getElementById('goles2').textContent,
+            ev: document.getElementById('evento').textContent,
+            t: document.getElementById('reloj').textContent,
+            c1: document.getElementById('barra-equipo1').style.backgroundColor,
+            c2: document.getElementById('barra-equipo2').style.backgroundColor,
+            cb: document.getElementById('barra').style.backgroundColor,
+            _: Date.now() // Parámetro anti-caché
+        });
+        
+        // Solo para debug (opcional)
+        console.log("URL actualizada:", params.toString());
+        
+        // Actualiza la URL sin recargar (para el editor)
+        if(!window.location.search.includes('obs=1')) {
+            history.replaceState(null, '', `?${params.toString()}`);
+        }
+        
+        // Copia automática para OBS
+        navigator.clipboard.writeText(`${baseURL}?${params.toString()}`).then(() => {
+            alert("¡URL actualizada copiada! Pégala en OBS");
+        });
+    }
+
+    // Actualizar color de barras (agrega parámetro anti-caché)
+    function updateBarColor(color) {
+        document.getElementById('barra').style.background = color;
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .evento::before, .evento::after {
+                border-color: ${color} !important;
+            }
+        `;
+        document.head.appendChild(style);
+        actualizarOBS(); // Auto-actualizar al cambiar color
+    }
+
+    // Vincula eventos para auto-actualizar
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', actualizarOBS);
     });
 
-    // Función para forzar actualización en OBS
-function actualizarOBS() {
-  const timestamp = new Date().getTime();
-  const urlOBS = `${window.location.href.split('?')[0]}?obs=1&t=${timestamp}`;
-  navigator.clipboard.writeText(urlOBS).then(() => {
-    alert("URL actualizada copiada. Pégala en OBS para ver los cambios");
-  });
-}
+    // Botón de actualización manual
+    const refreshBtn = document.createElement('button');
+    refreshBtn.textContent = 'ACTUALIZAR OBS';
+    refreshBtn.style.cssText = `
+        margin-top: 15px;
+        padding: 10px;
+        width: 100%;
+        background: #FF5722;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    `;
+    refreshBtn.onclick = actualizarOBS;
+    document.querySelector('.controles-generales').appendChild(refreshBtn);
 
-// Vincula a un nuevo botón "Actualizar OBS"
-const botonActualizar = document.createElement('button');
-botonActualizar.textContent = 'Actualizar OBS';
-botonActualizar.style.cssText = `
-  margin-top: 10px;
-  padding: 8px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-`;
-botonActualizar.onclick = actualizarOBS;
-document.querySelector('.controles-generales').appendChild(botonActualizar);
   </script>
 </body>
 </html>
