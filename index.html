@@ -359,6 +359,30 @@
       
       copiarPortapapeles(`${baseURL}?${params.toString()}`);
     });
+
+    // Función para forzar actualización en OBS
+function actualizarOBS() {
+  const timestamp = new Date().getTime();
+  const urlOBS = `${window.location.href.split('?')[0]}?obs=1&t=${timestamp}`;
+  navigator.clipboard.writeText(urlOBS).then(() => {
+    alert("URL actualizada copiada. Pégala en OBS para ver los cambios");
+  });
+}
+
+// Vincula a un nuevo botón "Actualizar OBS"
+const botonActualizar = document.createElement('button');
+botonActualizar.textContent = 'Actualizar OBS';
+botonActualizar.style.cssText = `
+  margin-top: 10px;
+  padding: 8px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+botonActualizar.onclick = actualizarOBS;
+document.querySelector('.controles-generales').appendChild(botonActualizar);
   </script>
 </body>
 </html>
